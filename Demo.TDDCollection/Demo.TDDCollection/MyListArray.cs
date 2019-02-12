@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Demo.TDDCollection
 {
@@ -15,7 +13,7 @@ namespace Demo.TDDCollection
         private int _count;
 
         #endregion
-        
+
         #region .ctors
 
         public MyListArray(int startCapacity = 10)
@@ -28,7 +26,8 @@ namespace Demo.TDDCollection
 
         #region indexer
 
-        public T this[int index] {
+        public T this[int index]
+        {
             get
             {
                 if (index < 0 || index >= _count)
@@ -37,7 +36,8 @@ namespace Demo.TDDCollection
                 }
                 return _arr[index];
             }
-            set {
+            set
+            {
                 if (index < 0 || index >= _count)
                 {
                     throw new IndexOutOfRangeException();
@@ -51,6 +51,7 @@ namespace Demo.TDDCollection
         public int Count => _count;
 
         public bool IsReadOnly => false;
+
 
         public void Add(T val)
         {
@@ -68,32 +69,75 @@ namespace Demo.TDDCollection
 
         public bool Contains(T item)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < _count; ++i)
+                if (Equals(_arr[i], item))
+                    return true;
+            return false;
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            if (arrayIndex + _count > array.Length)
+                throw new ArgumentException();
+            else if (arrayIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            else
+                for (int i = 0, j = arrayIndex; i < _count; ++i, ++j)
+                    array[j] = _arr[i];
         }
 
         public int IndexOf(T item)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < _count; ++i)
+                if (Equals(item, _arr[i]))
+                    return i;
+            return -1;
         }
 
         public void Insert(int index, T item)
         {
-            throw new NotImplementedException();
+            if (index < 0 || index > _count)
+                throw new ArgumentOutOfRangeException();
+
+            T temp = _arr[index];
+
+            for (int i = index; i < _count; ++i)
+            {
+                _arr[i] = item;
+                item = temp;
+            }
+            Add(item);
         }
 
         public bool Remove(T item)
         {
-            throw new NotImplementedException();
+            bool flag = false;
+
+            for (int i = 0; i < _count; ++i)
+            {
+                if (Equals(item, _arr[i]))
+                    flag = true;
+
+                if (flag)
+                    if (i + 1 < _count)
+                        _arr[i] = _arr[i + 1];
+            }
+            if (flag)
+                _count--;
+
+            return flag;
         }
 
         public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            if (index < 0 || index > _count)
+                throw new ArgumentOutOfRangeException();
+
+            for (int i = index; i < _count; ++i)           
+                if (i + 1 < _count)
+                    _arr[i] = _arr[i + 1];
+
+            _count--;
         }
 
         #region Enumerable
@@ -118,7 +162,7 @@ namespace Demo.TDDCollection
         object IEnumerator.Current => Current;
 
         public bool MoveNext()
-        {           
+        {
             return ++_currentIndex < _count;
         }
         public void Reset()
